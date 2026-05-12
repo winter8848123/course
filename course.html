@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曹春东 课表 — 2025-2026学年第2学期</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f8;
+    --card-bg: #ffffff;
+    --text: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #a0aec0;
+    --border: #e2e8f0;
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --today-bg: #eff6ff;
+    --today-border: #3b82f6;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,.08), 0 4px 10px rgba(0,0,0,.04);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --course-a: #4f46e5; --course-a-bg: #eef2ff;
+    --course-b: #0891b2; --course-b-bg: #ecfeff;
+    --course-c: #059669; --course-c-bg: #ecfdf5;
+    --course-d: #d97706; --course-d-bg: #fffbeb;
+    --course-e: #dc2626; --course-e-bg: #fef2f2;
+    --course-f: #7c3aed; --course-f-bg: #f5f3ff;
+    --course-g: #db2777; --course-g-bg: #fdf2f8;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+    color: #fff;
+    padding: 28px 24px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,.04);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -30px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,.03);
+    border-radius: 50%;
+  }
+  .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: 0.5px; position: relative; }
+  .header .subtitle { font-size: .88rem; opacity: .75; margin-top: 4px; position: relative; }
+
+  .current-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: .85rem;
+    position: relative;
+  }
+  .current-badge {
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.2);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: .82rem;
+  }
+  .dot { width: 7px; height: 7px; background: #34d399; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 14px 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .toolbar label { font-weight: 600; font-size: .9rem; color: var(--text-secondary); }
+  .toolbar select {
+    padding: 8px 32px 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: .9rem;
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color .2s;
+  }
+  .toolbar select:focus { outline: none; border-color: var(--primary); }
+  .view-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-left: auto;
+  }
+  .view-toggle button {
+    padding: 8px 16px;
+    border: none;
+    background: var(--card-bg);
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all .2s;
+  }
+  .view-toggle button.active { background: var(--primary); color: #fff; }
+  .view-toggle button:not(.active):hover { background: var(--primary-light); }
+
+  .day-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex: 1;
+    min-width: 60px;
+    padding: 12px 8px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .day-tab .day-name { display: block; font-size: .78rem; }
+  .day-tab .day-num { display: block; font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
+  .day-tab:hover { background: #f7fafc; }
+  .day-tab.active { background: var(--primary); color: #fff; }
+  .day-tab.today:not(.active) { background: var(--today-bg); color: var(--today-border); }
+
+  .hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: .85rem;
+    margin-bottom: 14px;
+  }
+
+  .course-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .course-card {
+    display: flex;
+    gap: 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid transparent;
+    transition: transform .2s, box-shadow .2s;
+    cursor: default;
+  }
+  .course-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+
+  .course-color-strip { width: 5px; border-radius: 3px; flex-shrink: 0; }
+  .course-card.color-a { border-left-color: var(--course-a); } .course-card.color-a .course-color-strip { background: var(--course-a); }
+  .course-card.color-b { border-left-color: var(--course-b); } .course-card.color-b .course-color-strip { background: var(--course-b); }
+  .course-card.color-c { border-left-color: var(--course-c); } .course-card.color-c .course-color-strip { background: var(--course-c); }
+  .course-card.color-d { border-left-color: var(--course-d); } .course-card.color-d .course-color-strip { background: var(--course-d); }
+  .course-card.color-e { border-left-color: var(--course-e); } .course-card.color-e .course-color-strip { background: var(--course-e); }
+  .course-card.color-f { border-left-color: var(--course-f); } .course-card.color-f .course-color-strip { background: var(--course-f); }
+  .course-card.color-g { border-left-color: var(--course-g); } .course-card.color-g .course-color-strip { background: var(--course-g); }
+
+  .course-body { flex: 1; }
+  .course-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .assessment-tag {
+    font-size: .72rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .assessment-tag.exam { background: #fef2f2; color: #dc2626; }
+  .assessment-tag.check { background: #fffbeb; color: #d97706; }
+
+  .course-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .85rem;
+    color: var(--text-secondary);
+  }
+  .course-detail { display: inline-flex; align-items: center; gap: 5px; }
+  .course-detail .icon { font-size: .95rem; }
+  .course-weeks { margin-top: 6px; font-size: .8rem; color: var(--text-muted); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+  .empty-state p { font-size: 1rem; }
+
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: 70px repeat(5, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-width: 600px;
+  }
+  .grid-header {
+    background: #f8fafc;
+    padding: 12px 6px;
+    text-align: center;
+    font-weight: 700;
+    font-size: .82rem;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border);
+  }
+  .grid-header.today-col { background: #eff6ff; color: var(--today-border); }
+  .grid-time {
+    background: #f8fafc;
+    padding: 14px 6px;
+    text-align: center;
+    font-size: .75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    border-right: 2px solid var(--border);
+  }
+  .grid-cell {
+    background: var(--card-bg);
+    padding: 6px;
+    min-height: 64px;
+    vertical-align: top;
+  }
+  .grid-cell.today-col { background: #fafbff; }
+  .grid-course {
+    font-size: .78rem;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 3px;
+    line-height: 1.4;
+    cursor: default;
+    transition: transform .15s;
+  }
+  .grid-course:hover { transform: scale(1.02); }
+  .grid-course .gc-name { font-weight: 700; }
+  .grid-course .gc-info { font-size: .72rem; opacity: .85; margin-top: 2px; }
+  .gc-a { background: var(--course-a-bg); color: var(--course-a); border-left: 3px solid var(--course-a); }
+  .gc-b { background: var(--course-b-bg); color: var(--course-b); border-left: 3px solid var(--course-b); }
+  .gc-c { background: var(--course-c-bg); color: var(--course-c); border-left: 3px solid var(--course-c); }
+  .gc-d { background: var(--course-d-bg); color: var(--course-d); border-left: 3px solid var(--course-d); }
+  .gc-e { background: var(--course-e-bg); color: var(--course-e); border-left: 3px solid var(--course-e); }
+  .gc-f { background: var(--course-f-bg); color: var(--course-f); border-left: 3px solid var(--course-f); }
+  .gc-g { background: var(--course-g-bg); color: var(--course-g); border-left: 3px solid var(--course-g); }
+
+  .grid-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 14px 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--text-secondary); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-dot.ld-a { background: var(--course-a); }
+  .legend-dot.ld-b { background: var(--course-b); }
+  .legend-dot.ld-c { background: var(--course-c); }
+  .legend-dot.ld-d { background: var(--course-d); }
+  .legend-dot.ld-e { background: var(--course-e); }
+  .legend-dot.ld-f { background: var(--course-f); }
+  .legend-dot.ld-g { background: var(--course-g); }
+
+  .footer { text-align: center; padding: 24px; color: var(--text-muted); font-size: .78rem; }
+
+  @media (max-width: 640px) {
+    .header { padding: 20px 16px; }
+    .header h1 { font-size: 1.3rem; }
+    .toolbar { flex-wrap: wrap; justify-content: center; }
+    .view-toggle { margin-left: 0; }
+    .course-details { flex-direction: column; gap: 4px; }
+    .course-card { padding: 14px 16px; }
+    .day-tab { padding: 10px 6px; }
+    .day-tab .day-num { font-size: .95rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>曹春东 课程表</h1>
+  <div class="subtitle">2025-2026学年第2学期 · 学号 2023214755</div>
+  <div class="current-indicator">
+    <span class="dot"></span>
+    <span class="current-badge">第 11 周 · 星期二</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="toolbar">
+    <label for="weekSelect">📅 周次</label>
+    <select id="weekSelect"></select>
+    <div class="view-toggle" id="viewToggle">
+      <button data-view="list" class="active">📋 列表</button>
+      <button data-view="grid">📊 周视图</button>
+    </div>
+  </div>
+
+  <div class="day-tabs" id="dayTabs">
+    <button class="day-tab" data-day="1"><span class="day-name">周一</span><span class="day-num">一</span></button>
+    <button class="day-tab today" data-day="2"><span class="day-name">周二</span><span class="day-num">二</span></button>
+    <button class="day-tab" data-day="3"><span class="day-name">周三</span><span class="day-num">三</span></button>
+    <button class="day-tab" data-day="4"><span class="day-name">周四</span><span class="day-num">四</span></button>
+    <button class="day-tab" data-day="5"><span class="day-name">周五</span><span class="day-num">五</span></button>
+  </div>
+
+  <div class="hint" id="hint">📌 当前显示：第 11 周 · 星期二</div>
+
+  <div class="course-list" id="courseList"></div>
+  <div class="grid-wrapper" id="gridView" style="display:none;">
+    <div class="schedule-grid" id="scheduleGrid"></div>
+  </div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <span class="emoji">🎉</span>
+    <p>这天没有课程安排</p>
+  </div>
+
+  <div class="legend" id="legend"></div>
+  <div class="footer">打印时间：2026-05-12 · 校区：抚州本部</div>
+</div>
+
+<script>
+// ========== Course Data (from PDF table extraction) ==========
+const COURSES = [
+  // Monday (1)
+  { id:'a', name:'大学生职业发展与就业指导(III)', day:1, periods:[1,2], time:'08:00-09:40', weeks:[1,2,3], location:'2-511', teacher:'唐华', assessment:'未安排', credits:'0.5', hours:'6' },
+  { id:'b', name:'固体物理', day:1, periods:[3,4], time:'10:00-11:40', weeks:[4,5,6,7,8,10,11,12,13,14,15], location:'2-414', teacher:'滕强', assessment:'考试', credits:'3.0', hours:'48' },
+  { id:'c', name:'热力学与统计物理', day:1, periods:[5,6], time:'14:00-15:40', weeks:[2,3,4,5,6,7,8,9,10,11], location:'2-213', teacher:'王兴豪', assessment:'考试', credits:'2.5', hours:'40' },
+  { id:'b', name:'固体物理', day:1, periods:[5,6], time:'14:00-15:40', weeks:[16], location:'2-110', teacher:'滕强', assessment:'考试', credits:'3.0', hours:'48' },
+  { id:'e', name:'粒子物理导论', day:1, periods:[7,8], time:'16:00-17:40', weeks:[2,3,4,5,6,7,8,9], location:'2-112', teacher:'余幼胜', assessment:'未安排', credits:'2.0', hours:'32' },
+
+  // Tuesday (2) — no courses
+
+  // Wednesday (3)
+  { id:'c', name:'热力学与统计物理', day:3, periods:[3,4], time:'10:00-11:40', weeks:[2,3,4,5,6,7,8,9,10,11], location:'2-213', teacher:'王兴豪', assessment:'考试', credits:'2.5', hours:'40' },
+  { id:'d', name:'广义相对论与宇宙学', day:3, periods:[5,6], time:'14:00-15:40', weeks:[9,10,11,12,13,14,15,16], location:'2-206', teacher:'陈童', assessment:'考查', credits:'2.0', hours:'32' },
+  { id:'f', name:'量子力学', day:3, periods:[7,8], time:'16:00-17:40', weeks:[2,3,4,5,6,7,8], location:'2-211', teacher:'孔师碑', assessment:'考试', credits:'3.5', hours:'56' },
+  { id:'f', name:'量子力学', day:3, periods:[7,8], time:'16:00-17:40', weeks:[9,10,11,12,13,14,15], location:'2-211', teacher:'陈童', assessment:'考试', credits:'3.5', hours:'56' },
+  { id:'b', name:'固体物理', day:3, periods:[7,8], time:'16:00-17:40', weeks:[16], location:'2-217', teacher:'滕强', assessment:'考试', credits:'3.0', hours:'48' },
+
+  // Thursday (4)
+  { id:'b', name:'固体物理', day:4, periods:[3,4], time:'10:00-11:40', weeks:[4,5,6,7,8,10,11,12,13,14,15], location:'2-217', teacher:'滕强', assessment:'考试', credits:'3.0', hours:'48' },
+  { id:'e', name:'粒子物理导论', day:4, periods:[5,6], time:'14:00-15:40', weeks:[2,3,4,5,6,7,8,9], location:'2-110', teacher:'余幼胜', assessment:'未安排', credits:'2.0', hours:'32' },
+
+  // Friday (5)
+  { id:'d', name:'广义相对论与宇宙学', day:5, periods:[3,4], time:'10:00-11:40', weeks:[9,10,11,12,13,14,15,16], location:'2-208', teacher:'陈童', assessment:'考查', credits:'2.0', hours:'32' },
+  { id:'f', name:'量子力学', day:5, periods:[5,6], time:'14:00-15:40', weeks:[2,3,4,5,6,7,8], location:'2-416', teacher:'孔师碑', assessment:'考试', credits:'3.5', hours:'56' },
+  { id:'f', name:'量子力学', day:5, periods:[5,6], time:'14:00-15:40', weeks:[9,10,11,12,13,14,15], location:'2-416', teacher:'陈童', assessment:'考试', credits:'3.5', hours:'56' },
+
+  // Practice
+  { id:'g', name:'课外科技活动(实践)', day:0, periods:[], time:'灵活', weeks:[1,2,3], location:'—', teacher:'黄星', assessment:'—', credits:'—', hours:'—' },
+];
+
+const COURSE_META = {
+  a: { colorClass:'color-a', gridClass:'gc-a', legendClass:'ld-a', shortName:'就业指导' },
+  b: { colorClass:'color-b', gridClass:'gc-b', legendClass:'ld-b', shortName:'固体物理' },
+  c: { colorClass:'color-c', gridClass:'gc-c', legendClass:'ld-c', shortName:'热统' },
+  d: { colorClass:'color-d', gridClass:'gc-d', legendClass:'ld-d', shortName:'广相宇宙学' },
+  e: { colorClass:'color-e', gridClass:'gc-e', legendClass:'ld-e', shortName:'粒子物理' },
+  f: { colorClass:'color-f', gridClass:'gc-f', legendClass:'ld-f', shortName:'量子力学' },
+  g: { colorClass:'color-g', gridClass:'gc-g', legendClass:'ld-g', shortName:'课外科技活动' },
+};
+
+const DAY_NAMES = ['', '周一', '周二', '周三', '周四', '周五'];
+const DAY_NAMES_FULL = ['', '星期一', '星期二', '星期三', '星期四', '星期五'];
+const PERIOD_TIMES = { '1-2':'08:00-09:40', '3-4':'10:00-11:40', '5-6':'14:00-15:40', '7-8':'16:00-17:40' };
+const PERIOD_LABELS = ['', '第1-2节', '', '第3-4节', '', '第5-6节', '', '第7-8节'];
+const MAX_WEEK = 16;
+const CURRENT_WEEK = 11;
+const CURRENT_DAY = 2;
+
+let selectedWeek = CURRENT_WEEK;
+let selectedDay = CURRENT_DAY;
+let viewMode = 'list';
+
+function getPeriodLabel(periods) {
+  if (!periods.length) return '灵活';
+  return PERIOD_TIMES[`${periods[0]}-${periods[periods.length-1]}`] || '';
+}
+
+function isCourseActive(course, week) { return course.weeks.includes(week); }
+
+function getCoursesForDay(week, day) {
+  return COURSES.filter(c => isCourseActive(c, week) && c.day === day)
+    .sort((a, b) => a.periods[0] - b.periods[0]);
+}
+
+function getCoursesForWeekGrid(week) {
+  const grid = {};
+  for (let d = 1; d <= 5; d++) grid[d] = {};
+  COURSES.filter(c => isCourseActive(c, week) && c.day >= 1 && c.day <= 5).forEach(c => {
+    const key = `${c.periods[0]}-${c.periods[c.periods.length-1]}`;
+    if (!grid[c.day][key]) grid[c.day][key] = [];
+    grid[c.day][key].push(c);
+  });
+  return grid;
+}
+
+function buildWeekOptions() {
+  let html = '';
+  for (let w = 1; w <= MAX_WEEK; w++) {
+    const sel = w === CURRENT_WEEK ? ' selected' : '';
+    html += `<option value="${w}"${sel}>第 ${w} 周</option>`;
+  }
+  return html;
+}
+
+function updateUI() {
+  document.getElementById('hint').textContent = `📌 当前显示：第 ${selectedWeek} 周 · ${DAY_NAMES_FULL[selectedDay]}`;
+  document.getElementById('weekSelect').value = selectedWeek;
+  document.querySelectorAll('.day-tab').forEach(tab => {
+    tab.classList.toggle('active', parseInt(tab.dataset.day) === selectedDay);
+  });
+
+  const badge = document.querySelector('.current-badge');
+  if (selectedWeek === CURRENT_WEEK && selectedDay === CURRENT_DAY) {
+    badge.innerHTML = '第 11 周 · 星期二 <span style="font-size:.7rem;margin-left:4px;">📍 当前</span>';
+  } else {
+    badge.textContent = `第 ${selectedWeek} 周 · ${DAY_NAMES_FULL[selectedDay]}`;
+  }
+
+  if (viewMode === 'list') {
+    document.getElementById('gridView').style.display = 'none';
+    document.getElementById('courseList').style.display = '';
+    document.getElementById('emptyState').style.display = '';
+    renderListView();
+  } else {
+    document.getElementById('courseList').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('gridView').style.display = '';
+    renderGridView();
+  }
+  renderLegend();
+}
+
+function renderListView() {
+  const courses = getCoursesForDay(selectedWeek, selectedDay);
+  const listEl = document.getElementById('courseList');
+  const emptyEl = document.getElementById('emptyState');
+  if (courses.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = courses.map(c => {
+    const meta = COURSE_META[c.id];
+    const periodLabel = getPeriodLabel(c.periods);
+    const ac = c.assessment === '考试' ? 'exam' : c.assessment === '考查' ? 'check' : '';
+    const weeksStr = c.weeks.length > 5
+      ? `${c.weeks[0]}-${c.weeks[c.weeks.length-1]}周`
+      : c.weeks.map(w => `${w}周`).join(',');
+    return `<div class="course-card ${meta.colorClass}">
+      <div class="course-color-strip"></div>
+      <div class="course-body">
+        <div class="course-name">${c.name}<span class="assessment-tag ${ac}">${c.assessment}</span></div>
+        <div class="course-details">
+          <span class="course-detail"><span class="icon">🕐</span> ${periodLabel || c.time}</span>
+          <span class="course-detail"><span class="icon">📍</span> ${c.location}</span>
+          <span class="course-detail"><span class="icon">👨‍🏫</span> ${c.teacher}</span>
+          <span class="course-detail"><span class="icon">📚</span> ${c.credits}学分 · ${c.hours}学时</span>
+        </div>
+        <div class="course-weeks">📅 第${weeksStr}</div>
+      </div></div>`;
+  }).join('');
+}
+
+function renderGridView() {
+  const gridData = getCoursesForWeekGrid(selectedWeek);
+  const gridEl = document.getElementById('scheduleGrid');
+  let html = '<div class="grid-header" style="font-size:.7rem;">节次</div>';
+  for (let d = 1; d <= 5; d++) {
+    const tc = (d === selectedDay) ? ' today-col' : '';
+    html += `<div class="grid-header${tc}">${DAY_NAMES[d]}</div>`;
+  }
+  ['1-2','3-4','5-6','7-8'].forEach(slotKey => {
+    html += `<div class="grid-time">${PERIOD_LABELS[parseInt(slotKey)]}<br><span style="font-size:.7rem">${PERIOD_TIMES[slotKey]}</span></div>`;
+    for (let d = 1; d <= 5; d++) {
+      const tc = (d === selectedDay) ? ' today-col' : '';
+      html += `<div class="grid-cell${tc}">`;
+      (gridData[d]?.[slotKey] || []).forEach(c => {
+        const meta = COURSE_META[c.id];
+        html += `<div class="grid-course ${meta.gridClass}"><div class="gc-name">${c.name}</div><div class="gc-info">${c.location} · ${c.teacher}</div></div>`;
+      });
+      html += '</div>';
+    }
+  });
+  gridEl.innerHTML = html;
+}
+
+function renderLegend() {
+  const seen = new Set();
+  const items = [];
+  COURSES.forEach(c => {
+    if (!seen.has(c.id)) { seen.add(c.id); items.push({ id:c.id, name:c.name, lc:COURSE_META[c.id].legendClass }); }
+  });
+  document.getElementById('legend').innerHTML = items.map(i =>
+    `<div class="legend-item"><span class="legend-dot ${i.lc}"></span> ${i.name}</div>`
+  ).join('');
+}
+
+document.getElementById('weekSelect').addEventListener('change', function() {
+  selectedWeek = parseInt(this.value);
+  updateUI();
+});
+document.getElementById('dayTabs').addEventListener('click', function(e) {
+  const tab = e.target.closest('.day-tab');
+  if (!tab) return;
+  selectedDay = parseInt(tab.dataset.day);
+  updateUI();
+});
+document.getElementById('viewToggle').addEventListener('click', function(e) {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  viewMode = btn.dataset.view;
+  document.querySelectorAll('#viewToggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateUI();
+});
+
+function init() {
+  document.getElementById('weekSelect').innerHTML = buildWeekOptions();
+  selectedWeek = CURRENT_WEEK;
+  selectedDay = CURRENT_DAY;
+  document.querySelectorAll('.day-tab').forEach(tab => {
+    if (parseInt(tab.dataset.day) === CURRENT_DAY) tab.classList.add('active');
+  });
+  updateUI();
+}
+init();
+</script>
+</body>
+</html>
